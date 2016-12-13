@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
+
+    <filter>
+        <filter-name>AuthenticationFilter</filter-name>
+        <filter-class>AuthenticationFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>AuthenticationFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <servlet>
+        <servlet-name>loginServlet</servlet-name>
+        <servlet-class>LoginServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>loginServlet</servlet-name>
+        <url-pattern>/loginServlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>logoutServlet</servlet-name>
+        <servlet-class>LogoutServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>logoutServlet</servlet-name>
+        <url-pattern>/logoutServlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>wrongLoginServlet</servlet-name>
+        <servlet-class>WrongLoginServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>wrongLoginServlet</servlet-name>
+        <url-pattern>/wrongLogin</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>dataServlet</servlet-name>
+        <servlet-class>DataServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>dataServlet</servlet-name>
+        <url-pattern>/dataServlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>questionServlet</servlet-name>
+        <servlet-class>QuestionServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>questionServlet</servlet-name>
+        <url-pattern>/questionServlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>signUpServlet</servlet-name>
+        <servlet-class>SignUpServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>signUpServlet</servlet-name>
+        <url-pattern>/signUpServlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>search</servlet-name>
+        <servlet-class>SearchServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>search</servlet-name>
+        <url-pattern>/searchServlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>editServlet</servlet-name>
+        <servlet-class>EditServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>editServlet</servlet-name>
+        <url-pattern>/editServlet</url-pattern>
+    </servlet-mapping>
+
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+</web-app>
