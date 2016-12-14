@@ -6,10 +6,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,70 +56,55 @@ public class QuestionServlet extends HttpServlet {
     String noQuestionsString = req.getParameter("noQuestions");
     int noQuestion = Integer.parseInt(noQuestionsString);
 
-    Connection connection = null;
-    PreparedStatement preparedStatement = null;
-    ResultSet resultSet = null;
     boolean allCorrect = true;
 
     try {
-      connection = DatabaseUtil.getConnection();
-      HttpSession session = req.getSession();
-      int questionId = -1;
       for (int i = 0; i < noQuestion; i++) {
-        preparedStatement = connection.prepareStatement("SELECT * FROM questions q WHERE q.id = ? AND q.correct_answer=?");
         String questionIdString = req.getParameter("question" + i);
-        questionId = Integer.parseInt(questionIdString);
+        int questionId = Integer.parseInt(questionIdString);
         String answer = req.getParameter("answer" + i);
-        preparedStatement.setInt(1, questionId);
-        preparedStatement.setString(2, answer);
-        resultSet = preparedStatement.executeQuery();
-        if (!resultSet.next()) {
-          allCorrect = false;
-        }
+        boolean correct = DatabaseUtil.checkAnswer(questionId, answer);
+        allCorrect = allCorrect && correct;
       }
-      if (allCorrect && questionId != -1) {
-        preparedStatement = connection.prepareStatement("SELECT q.test_id FROM questions q WHERE q.id=?");
-        preparedStatement.setInt(1, questionId);
-        resultSet = preparedStatement.executeQuery();
-        int testId = -1;
-        if (resultSet.next()) {
-          testId = resultSet.getInt(1);
-        }
-        preparedStatement = connection.prepareStatement("SELECT u.tests FROM users u WHERE u.name=?");
-        preparedStatement.setString(1, (String) session.getAttribute("user"));
-        resultSet = preparedStatement.executeQuery();
-        String completed = null;
-        boolean somethingNew = false;
-        if (resultSet.next()) {
-          completed = resultSet.getString(1);
-          if (!completed.contains(testId + "")) {
-            somethingNew = true;
-            if (completed.isEmpty()) {
-              completed = testId + "";
-            } else {
-              completed += ";" + testId;
-            }
-          }
-        }
-        if (completed == null) {
-          completed = testId + "";
-        }
-        preparedStatement = connection.prepareStatement("UPDATE users u SET u.tests=? WHERE u.user_name=?");
-        preparedStatement.setString(1, completed);
-        preparedStatement.setString(2, (String) session.getAttribute("user"));
-        preparedStatement.execute();
-        if (somethingNew) {
-          int level = (Integer) session.getAttribute("level");
-          level++;
-          session.setAttribute("level", level);
-        }
-      }
-    } catch (SQLException e) {
+//      if (allCorrect && questionId != -1) {
+//        preparedStatement = connection.prepareStatement("SELECT q.test_id FROM questions q WHERE q.id=?");
+//        preparedStatement.setInt(1, questionId);
+//        resultSet = preparedStatement.executeQuery();
+//        int testId = -1;
+//        if (resultSet.next()) {
+//          testId = resultSet.getInt(1);
+//        }
+//        preparedStatement = connection.prepareStatement("SELECT u.tests FROM users u WHERE u.name=?");
+//        preparedStatement.setString(1, (String) session.getAttribute("user"));
+//        resultSet = preparedStatement.executeQuery();
+//        String completed = null;
+//        boolean somethingNew = false;
+//        if (resultSet.next()) {
+//          completed = resultSet.getString(1);
+//          if (!completed.contains(testId + "")) {
+//            somethingNew = true;
+//            if (completed.isEmpty()) {
+//              completed = testId + "";
+//            } else {
+//              completed += ";" + testId;
+//            }
+//          }
+//        }
+//        if (completed == null) {
+//          completed = testId + "";
+//        }
+//        preparedStatement = connection.prepareStatement("UPDATE users u SET u.tests=? WHERE u.user_name=?");
+//        preparedStatement.setString(1, completed);
+//        preparedStatement.setString(2, (String) session.getAttribute("user"));
+//        preparedStatement.execute();
+//        if (somethingNew) {
+//          int level = (Integer) session.getAttribute("level");
+//          level++;
+//          session.setAttribute("level", level);
+//        }
+//      }
+    } catch (Exception e) {
       e.printStackTrace();
-    } finally {
-      DatabaseUtil.closeResultSet(resultSet);
-      DatabaseUtil.closePreparedStatement(preparedStatement);
-      DatabaseUtil.closeConnection(connection);
     }
 
     RequestDispatcher rd = req.getRequestDispatcher("/loginSuccess.jsp");

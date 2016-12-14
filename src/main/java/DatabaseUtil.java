@@ -188,21 +188,27 @@ public class DatabaseUtil {
     Connection connection = null;
     PreparedStatement preparedStatement = null;
     ResultSet resultSet = null;
-    boolean allCorrect = true;
+    boolean allCorrect = false;
 
-    try {
-      connection = DatabaseUtil.getConnection();
-      for (int i = 0; i < noQuestion; i++) {
-        preparedStatement = connection.prepareStatement("SELECT * FROM questions q WHERE q.id = ? AND q.correct_answer=?");
-        String questionIdString = req.getParameter("question" + i);
-        questionId = Integer.parseInt(questionIdString);
-        String answer = req.getParameter("answer" + i);
-        preparedStatement.setInt(1, questionId);
-        preparedStatement.setString(2, answer);
-        resultSet = preparedStatement.executeQuery();
-        if (!resultSet.next()) {
-          allCorrect = false;
-        }
-      }
+    return true;
+
+//    try {
+//      connection = DatabaseUtil.getConnection();
+//      preparedStatement = connection.prepareStatement("SELECT * FROM questions q WHERE q.id = ? AND q.correct_answer=?");
+//      preparedStatement.setInt(1, questionId);
+//      preparedStatement.setString(2, answer);
+//      resultSet = preparedStatement.executeQuery();
+//      if (resultSet.next()) {
+//        allCorrect = true;
+//      }
+//    } catch (SQLException e) {
+//      e.printStackTrace();
+//    } finally {
+//      DatabaseUtil.closeResultSet(resultSet);
+//      DatabaseUtil.closePreparedStatement(preparedStatement);
+//      DatabaseUtil.closeConnection(connection);
+//    }
+//
+//    return allCorrect;
   }
 }
