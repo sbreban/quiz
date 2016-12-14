@@ -5,15 +5,14 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.*;
+import java.util.List;
 
 
 public class DataServlet extends HttpServlet {
 
   public void doGet(HttpServletRequest request,
                     HttpServletResponse response)
-      throws IOException, ServletException
-  {
+      throws IOException, ServletException {
     response.setContentType("text/html");
 
     HttpSession httpSession = request.getSession();
@@ -26,29 +25,17 @@ public class DataServlet extends HttpServlet {
     out.println("</head>");
     out.println("<body>");
 
-    Connection connection = null;
-    PreparedStatement preparedStatement = null;
-    ResultSet resultSet = null;
-
     try {
-      connection = DatabaseUtil.getConnection();
-      preparedStatement = connection.prepareStatement("select * from tests t where t.level <= ?");
-      preparedStatement.setInt(1, level);
-      resultSet = preparedStatement.executeQuery();
-      while(resultSet.next())
-      {
+      List<Test> tests = DatabaseUtil.getTests(level);
+      for (Test test : tests) {
         out.println("<form action=\"/questionServlet\" method=\"get\">");
-        out.println("<input type=\"text\" name=\"testId\" value=\""+resultSet.getInt(1)+"\"/>");
-        out.println("<input type=\"submit\" value=\""+resultSet.getString(2)+" Level "
-            +resultSet.getInt(3)+"\"/>");
+        out.println("<input type=\"text\" name=\"testId\" value=\"" + test.getId() + "\"/>");
+        out.println("<input type=\"submit\" value=\"" + test.getName() + " Level "
+            + test.getLevel() + "\"/>");
         out.println("</form>");
       }
-    } catch (SQLException e) {
+    } catch (Exception e) {
       e.printStackTrace();
-    } finally {
-      DatabaseUtil.closeResultSet(resultSet);
-      DatabaseUtil.closePreparedStatement(preparedStatement);
-      DatabaseUtil.closeConnection(connection);
     }
 
     out.println("</body>");

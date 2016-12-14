@@ -10,6 +10,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Sergiu on 19.01.2016.
@@ -29,36 +31,24 @@ public class QuestionServlet extends HttpServlet {
     out.println("</head>");
     out.println("<body>");
 
-    Connection connection = null;
-    PreparedStatement preparedStatement = null;
-    ResultSet resultSet = null;
-    int questions = 0;
-
+    List<Question> questionList = new ArrayList<Question>();
     try {
-      connection = DatabaseUtil.getConnection();
-      preparedStatement = connection.prepareStatement("select * from questions q where q.test_id = ?");
-      preparedStatement.setInt(1, testId);
-      resultSet = preparedStatement.executeQuery();
+      questionList = DatabaseUtil.getQuestions(testId);
       out.println("<form action=\"/questionServlet\" method=\"post\">");
-      while(resultSet.next())
-      {
-        out.println("<p><input type=\"text\" name=\"question"+questions+"\" width=\"20\" value=\""+resultSet.getInt(1)+"\"/>");
-        out.println(resultSet.getString(3)+"<br>");
-        out.println("<input type=\"radio\" name=\"answer"+questions+"\" value=\""+resultSet.getString(4)+"\">"
-            +resultSet.getString(4)+"<br>");
-        out.println("<input type=\"radio\" name=\"answer"+questions+"\" value=\""+resultSet.getString(5)+"\">"
-            +resultSet.getString(5)+"<br>");
-        questions++;
+      for (int i = 0; i < questionList.size(); i++) {
+        Question question = questionList.get(i);
+        out.println("<p><input type=\"text\" name=\"question" + i + "\" width=\"20\" value=\"" + question.getId() + "\"/>");
+        out.println(question.getQuestion() + "<br>");
+        out.println("<input type=\"radio\" name=\"answer" + i + "\" value=\"" + question.getCorrectAnswer() + "\">"
+            + question.getCorrectAnswer() + "<br>");
+        out.println("<input type=\"radio\" name=\"answer" + i + "\" value=\"" + question.getWrongAnswer() + "\">"
+            + question.getWrongAnswer() + "<br>");
       }
-    } catch (SQLException e) {
+    } catch (Exception e) {
       e.printStackTrace();
-    } finally {
-      DatabaseUtil.closeResultSet(resultSet);
-      DatabaseUtil.closePreparedStatement(preparedStatement);
-      DatabaseUtil.closeConnection(connection);
     }
 
-    out.println("No questions: <input type=\"text\" name=\"noQuestions\" value=\""+questions+"\"><br>");
+    out.println("No questions: <input type=\"text\" name=\"noQuestions\" value=\"" + questionList.size() + "\"><br>");
     out.println("<input type=\"submit\" value=\"Check answers\">");
     out.println("</form>");
     out.println("</body>");
@@ -80,10 +70,10 @@ public class QuestionServlet extends HttpServlet {
       HttpSession session = req.getSession();
       int questionId = -1;
       for (int i = 0; i < noQuestion; i++) {
-        preparedStatement = connection.prepareStatement("SELECT * FROM questions q WHERE q.id = ? and q.correct_answer=?");
-        String questionIdString = req.getParameter("question"+i);
+        preparedStatement = connection.prepareStatement("SELECT * FROM questions q WHERE q.id = ? AND q.correct_answer=?");
+        String questionIdString = req.getParameter("question" + i);
         questionId = Integer.parseInt(questionIdString);
-        String answer = req.getParameter("answer"+i);
+        String answer = req.getParameter("answer" + i);
         preparedStatement.setInt(1, questionId);
         preparedStatement.setString(2, answer);
         resultSet = preparedStatement.executeQuery();
@@ -92,15 +82,15 @@ public class QuestionServlet extends HttpServlet {
         }
       }
       if (allCorrect && questionId != -1) {
-        preparedStatement = connection.prepareStatement("select q.test_id from questions q where q.id=?");
+        preparedStatement = connection.prepareStatement("SELECT q.test_id FROM questions q WHERE q.id=?");
         preparedStatement.setInt(1, questionId);
         resultSet = preparedStatement.executeQuery();
         int testId = -1;
         if (resultSet.next()) {
           testId = resultSet.getInt(1);
         }
-        preparedStatement = connection.prepareStatement("select u.tests from users u where u.name=?");
-        preparedStatement.setString(1, (String)session.getAttribute("user"));
+        preparedStatement = connection.prepareStatement("SELECT u.tests FROM users u WHERE u.name=?");
+        preparedStatement.setString(1, (String) session.getAttribute("user"));
         resultSet = preparedStatement.executeQuery();
         String completed = null;
         boolean somethingNew = false;
@@ -116,11 +106,11 @@ public class QuestionServlet extends HttpServlet {
           }
         }
         if (completed == null) {
-          completed = testId+"";
+          completed = testId + "";
         }
-        preparedStatement = connection.prepareStatement("update users u set u.tests=? where u.user_name=?");
+        preparedStatement = connection.prepareStatement("UPDATE users u SET u.tests=? WHERE u.user_name=?");
         preparedStatement.setString(1, completed);
-        preparedStatement.setString(2, (String)session.getAttribute("user"));
+        preparedStatement.setString(2, (String) session.getAttribute("user"));
         preparedStatement.execute();
         if (somethingNew) {
           int level = (Integer) session.getAttribute("level");
