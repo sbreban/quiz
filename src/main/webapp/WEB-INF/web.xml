@@ -55,33 +55,6 @@
         <url-pattern>/questionServlet</url-pattern>
     </servlet-mapping>
 
-    <servlet>
-        <servlet-name>signUpServlet</servlet-name>
-        <servlet-class>SignUpServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>signUpServlet</servlet-name>
-        <url-pattern>/signUpServlet</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
-        <servlet-name>search</servlet-name>
-        <servlet-class>SearchServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>search</servlet-name>
-        <url-pattern>/searchServlet</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
-        <servlet-name>editServlet</servlet-name>
-        <servlet-class>EditServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>editServlet</servlet-name>
-        <url-pattern>/editServlet</url-pattern>
-    </servlet-mapping>
-
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>

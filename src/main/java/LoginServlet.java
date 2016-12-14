@@ -18,13 +18,13 @@ public class LoginServlet extends HttpServlet {
     String password = req.getParameter("password");
 
     try {
-      User user = DatabaseUtil.getUser(login, password);
+      User user = Database.getInstance().getUser(login, password);
       if (user != null) {
         HttpSession session = req.getSession();
         session.setAttribute("user", login);
         session.setMaxInactiveInterval(60);
         String completedTests = user.getTests();
-        int level = DatabaseUtil.getMaxLevel(completedTests);
+        int level = Database.getInstance().getMaxLevel(completedTests);
         session.setAttribute("level", level);
         rd = req.getRequestDispatcher("/loginSuccess.jsp");
       } else {

@@ -3,7 +3,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -29,7 +28,7 @@ public class QuestionServlet extends HttpServlet {
 
     List<Question> questionList = new ArrayList<Question>();
     try {
-      questionList = DatabaseUtil.getQuestions(testId);
+      questionList = Database.getInstance().getQuestions(testId);
       out.println("<form action=\"/questionServlet\" method=\"post\">");
       for (int i = 0; i < questionList.size(); i++) {
         Question question = questionList.get(i);
@@ -63,51 +62,19 @@ public class QuestionServlet extends HttpServlet {
         String questionIdString = req.getParameter("question" + i);
         int questionId = Integer.parseInt(questionIdString);
         String answer = req.getParameter("answer" + i);
-        boolean correct = DatabaseUtil.checkAnswer(questionId, answer);
+        boolean correct = Database.getInstance().checkAnswer(questionId, answer);
         allCorrect = allCorrect && correct;
       }
-//      if (allCorrect && questionId != -1) {
-//        preparedStatement = connection.prepareStatement("SELECT q.test_id FROM questions q WHERE q.id=?");
-//        preparedStatement.setInt(1, questionId);
-//        resultSet = preparedStatement.executeQuery();
-//        int testId = -1;
-//        if (resultSet.next()) {
-//          testId = resultSet.getInt(1);
-//        }
-//        preparedStatement = connection.prepareStatement("SELECT u.tests FROM users u WHERE u.name=?");
-//        preparedStatement.setString(1, (String) session.getAttribute("user"));
-//        resultSet = preparedStatement.executeQuery();
-//        String completed = null;
-//        boolean somethingNew = false;
-//        if (resultSet.next()) {
-//          completed = resultSet.getString(1);
-//          if (!completed.contains(testId + "")) {
-//            somethingNew = true;
-//            if (completed.isEmpty()) {
-//              completed = testId + "";
-//            } else {
-//              completed += ";" + testId;
-//            }
-//          }
-//        }
-//        if (completed == null) {
-//          completed = testId + "";
-//        }
-//        preparedStatement = connection.prepareStatement("UPDATE users u SET u.tests=? WHERE u.user_name=?");
-//        preparedStatement.setString(1, completed);
-//        preparedStatement.setString(2, (String) session.getAttribute("user"));
-//        preparedStatement.execute();
-//        if (somethingNew) {
-//          int level = (Integer) session.getAttribute("level");
-//          level++;
-//          session.setAttribute("level", level);
-//        }
-//      }
     } catch (Exception e) {
       e.printStackTrace();
     }
 
-    RequestDispatcher rd = req.getRequestDispatcher("/loginSuccess.jsp");
-    rd.forward(req, resp);
+    if (allCorrect) {
+      RequestDispatcher rd = req.getRequestDispatcher("/correctAnswer.jsp");
+      rd.forward(req, resp);
+    } else {
+      RequestDispatcher rd = req.getRequestDispatcher("/loginSuccess.jsp");
+      rd.forward(req, resp);
+    }
   }
 }

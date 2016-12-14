@@ -26,7 +26,7 @@ public class DataServlet extends HttpServlet {
     out.println("<body>");
 
     try {
-      List<Test> tests = DatabaseUtil.getTests(level);
+      List<Test> tests = Database.getInstance().getTests(level);
       for (Test test : tests) {
         out.println("<form action=\"/questionServlet\" method=\"get\">");
         out.println("<input type=\"text\" name=\"testId\" value=\"" + test.getId() + "\"/>");
